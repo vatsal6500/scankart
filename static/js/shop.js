@@ -168,6 +168,29 @@
 
   async function startWith(source) {
     await scanner.start(source, scanConfig(source), onScan, () => {});
+    // modest lens zoom helps small product barcodes (supported on Android
+    // Chrome; silently unsupported elsewhere)
+    try {
+      const caps = scanner.getRunningTrackCapabilities();
+      if (caps && caps.zoom && caps.zoom.max > 1) {
+        await scanner.applyVideoConstraints({ advanced: [{ zoom: Math.min(2, caps.zoom.max) }] });
+      }
+    } catch {}
+  }
+
+  // photo-capture fallback: native camera handles focus/macro far better than
+  // the live feed — decodes tiny/curved barcodes on any device and browser
+  async function scanFromPhoto(file) {
+    toast('Reading photo…');
+    const fileScanner = new Html5Qrcode('file-reader', { formatsToSupport: SCAN_FORMATS, verbose: false });
+    try {
+      const code = await fileScanner.scanFile(file, false);
+      await lookupAndAdd(code.trim(), true);
+    } catch {
+      toast('No barcode readable in that photo — fill the frame & keep it sharp', true);
+    } finally {
+      try { fileScanner.clear(); } catch {}
+    }
   }
 
   async function openScanner() {
@@ -353,6 +376,12 @@
   $('open-scanner').addEventListener('click', openScanner);
   $('close-scanner').addEventListener('click', closeScanner);
   $('switch-camera').addEventListener('click', switchCamera);
+  $('snap-photo').addEventListener('click', () => $('photo-input').click());
+  $('photo-input').addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (file) scanFromPhoto(file);
+  });
   $('open-cart').addEventListener('click', openCart);
   $('close-cart').addEventListener('click', closeCart);
   $('cart-sheet-backdrop').addEventListener('click', closeCart);

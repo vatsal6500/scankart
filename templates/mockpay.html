@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Pay — {{ APP_NAME }}{% endblock %}
+{% block content %}
+<div class="min-h-screen max-w-md mx-auto flex flex-col bg-gray-100">
+  <header class="bg-gray-900 text-white px-5 py-4 flex items-center justify-between">
+    <div>
+      <p class="text-xs text-gray-400">Paying {{ order.outlet.name }}</p>
+      <p class="font-extrabold text-2xl">₹{{ '%.2f' | format(order.total) }}</p>
+    </div>
+    <span class="text-[10px] font-bold bg-amber-400 text-gray-900 px-2 py-1 rounded-full uppercase">Demo Gateway</span>
+  </header>
+
+  {% if already_paid %}
+  <main class="flex-1 flex flex-col items-center justify-center px-6 text-center">
+    <div class="text-5xl mb-3">✅</div>
+    <p class="font-bold text-lg mb-4">This order is already paid.</p>
+    <a href="/bill/{{ order.id }}" class="bg-emerald-600 text-white font-bold rounded-2xl px-6 py-3">View bill</a>
+  </main>
+  {% else %}
+  <main class="flex-1 px-5 py-6 space-y-4">
+    <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Choose payment method</p>
+
+    <div class="space-y-2" id="methods">
+      <label class="flex items-center gap-3 bg-white rounded-2xl p-4 border-2 border-emerald-500 cursor-pointer">
+        <input type="radio" name="method" value="upi" checked class="accent-emerald-600">
+        <span class="text-2xl">📱</span>
+        <span><span class="font-bold block text-sm">UPI</span><span class="text-xs text-gray-400">GPay / PhonePe / Paytm</span></span>
+      </label>
+      <label class="flex items-center gap-3 bg-white rounded-2xl p-4 border-2 border-transparent cursor-pointer">
+        <input type="radio" name="method" value="card" class="accent-emerald-600">
+        <span class="text-2xl">💳</span>
+        <span><span class="font-bold block text-sm">Card</span><span class="text-xs text-gray-400">Credit / Debit card</span></span>
+      </label>
+      <label class="flex items-center gap-3 bg-white rounded-2xl p-4 border-2 border-transparent cursor-pointer">
+        <input type="radio" name="method" value="netbanking" class="accent-emerald-600">
+        <span class="text-2xl">🏦</span>
+        <span><span class="font-bold block text-sm">Netbanking</span><span class="text-xs text-gray-400">All major banks</span></span>
+      </label>
+    </div>
+
+    <button id="pay-btn"
+            class="w-full bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-2xl py-4 font-bold text-lg shadow-lg active:scale-[0.98] transition">
+      Pay ₹{{ '%.2f' | format(order.total) }}
+    </button>
+    <p class="text-center text-xs text-gray-400">🔒 Demo payment — no real money is charged.<br>Connect Razorpay test keys for the real gateway popup.</p>
+  </main>
+
+  <!-- processing overlay -->
+  <div id="processing" class="fixed inset-0 bg-white/95 z-50 hidden flex-col items-center justify-center gap-4">
+    <div class="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
+    <p class="font-semibold text-gray-600" id="processing-text">Contacting bank…</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+{% block scripts %}
+{% if not already_paid %}
+<script>
+  const btn = document.getElementById('pay-btn');
+  const overlay = document.getElementById('processing');
+  const txt = document.getElementById('processing-text');
+  document.querySelectorAll('#methods label').forEach(l => {
+    l.addEventListener('click', () => {
+      document.querySelectorAll('#methods label').forEach(x => x.classList.replace('border-emerald-500', 'border-transparent'));
+      l.classList.replace('border-transparent', 'border-emerald-500');
+    });
+  });
+  btn.addEventListener('click', async () => {
+    overlay.classList.remove('hidden'); overlay.classList.add('flex');
+    await new Promise(r => setTimeout(r, 1200));
+    txt.textContent = 'Confirming payment…';
+    const res = await fetch('/api/payment/mock/{{ order.id }}', { method: 'POST' });
+    const data = await res.json();
+    if (res.ok) {
+      txt.textContent = 'Payment successful ✓';
+      localStorage.removeItem('scankart_cart_{{ order.outlet_id }}');
+      setTimeout(() => window.location.href = data.bill_url, 700);
+    } else {
+      overlay.classList.add('hidden'); overlay.classList.remove('flex');
+      alert(data.detail || 'Payment failed');
+    }
+  });
+</script>
+{% endif %}
+{% endblock %}

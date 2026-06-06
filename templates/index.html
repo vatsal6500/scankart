@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ APP_NAME }} — Scan. Pay. Go.{% endblock %}
+{% block content %}
+<div class="min-h-screen flex flex-col">
+
+  <!-- Hero -->
+  <header class="bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 text-white px-6 pt-12 pb-16 rounded-b-[2.5rem] shadow-lg relative overflow-hidden">
+    <div class="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-full"></div>
+    <div class="absolute top-24 -left-12 w-32 h-32 bg-white/10 rounded-full"></div>
+    <div class="relative max-w-md mx-auto">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center text-2xl">🛒</div>
+        <h1 class="text-3xl font-extrabold tracking-tight">{{ APP_NAME }}</h1>
+      </div>
+      <p class="text-xl font-semibold leading-snug">Scan. Pay. Go.</p>
+      <p class="text-emerald-100 mt-1 text-sm">Skip the queue — scan products with your phone, pay online and walk out with your bill.</p>
+    </div>
+  </header>
+
+  <!-- Steps -->
+  <div class="max-w-md mx-auto w-full px-6 -mt-8 relative z-10">
+    <div class="bg-white rounded-2xl shadow-md p-4 flex justify-between text-center text-xs font-medium text-gray-600">
+      <div class="flex-1"><div class="text-2xl mb-1">📍</div>Choose<br>store</div>
+      <div class="flex-1"><div class="text-2xl mb-1">📷</div>Scan<br>products</div>
+      <div class="flex-1"><div class="text-2xl mb-1">💳</div>Pay<br>online</div>
+      <div class="flex-1"><div class="text-2xl mb-1">🧾</div>Get bill<br>&amp; exit</div>
+    </div>
+  </div>
+
+  <!-- Outlet list -->
+  <main class="max-w-md mx-auto w-full px-6 py-8 flex-1">
+    <h2 class="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4">Select your store</h2>
+    <div class="space-y-3">
+      {% for outlet in outlets %}
+      <a href="/shop/{{ outlet.id }}"
+         class="flex items-center gap-4 bg-white rounded-2xl shadow-sm hover:shadow-md transition-all p-4 border border-gray-100 active:scale-[0.98]">
+        <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-3xl shrink-0">{{ outlet.emoji }}</div>
+        <div class="flex-1 min-w-0">
+          <p class="font-bold text-gray-900">{{ outlet.name }}</p>
+          <p class="text-sm text-gray-500 truncate">{{ outlet.address }}</p>
+        </div>
+        <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </a>
+      {% endfor %}
+    </div>
+  </main>
+
+  <footer class="text-center text-xs text-gray-400 pb-6">
+    {{ APP_NAME }} demo · <a href="/docs" class="underline">API docs</a> · <a href="/admin" class="underline">Store admin</a>
+  </footer>
+</div>
+{% endblock %}

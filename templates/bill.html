@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Bill {{ order.id }} — {{ APP_NAME }}{% endblock %}
+{% block head %}
+<style>
+  @media print {
+    .no-print { display: none !important; }
+    body { background: white !important; }
+    .receipt { box-shadow: none !important; border: none !important; }
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="min-h-screen max-w-md mx-auto px-4 py-6">
+
+  <!-- success banner -->
+  <div class="no-print text-center mb-5">
+    <div class="w-16 h-16 mx-auto bg-emerald-100 rounded-full flex items-center justify-center text-3xl mb-2 animate-bounce">✅</div>
+    <h1 class="font-extrabold text-xl text-emerald-700">Payment successful!</h1>
+    <p class="text-sm text-gray-500">Show the exit QR below to staff on your way out.</p>
+  </div>
+
+  <!-- receipt -->
+  <div class="receipt bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+    <div class="bg-gray-900 text-white px-5 py-4 text-center">
+      <p class="font-extrabold text-lg tracking-tight">🛒 {{ APP_NAME }}</p>
+      <p class="text-xs text-gray-300">{{ order.outlet.name }}</p>
+      <p class="text-[10px] text-gray-400">{{ order.outlet.address }}</p>
+    </div>
+
+    <div class="px-5 py-3 text-xs text-gray-500 flex justify-between border-b border-dashed">
+      <span>Bill No: <span class="font-bold text-gray-800">{{ order.id }}</span></span>
+      <span>{{ order.paid_at.strftime('%d %b %Y, %H:%M') }} UTC</span>
+    </div>
+
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-[10px] uppercase tracking-wider text-gray-400 border-b">
+          <th class="text-left px-5 py-2 font-semibold">Item</th>
+          <th class="text-center py-2 font-semibold">Qty</th>
+          <th class="text-right px-5 py-2 font-semibold">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in order.items %}
+        <tr class="border-b border-gray-50">
+          <td class="px-5 py-2.5">
+            <span class="mr-1">{{ item.emoji }}</span>{{ item.name }}
+            <span class="block text-[10px] text-gray-400">₹{{ '%.2f' | format(item.unit_price) }} · GST {{ item.gst_percent | int }}%</span>
+          </td>
+          <td class="text-center font-semibold">{{ item.qty }}</td>
+          <td class="text-right px-5 font-semibold">₹{{ '%.2f' | format(item.line_total) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="px-5 py-3 text-sm space-y-1 border-b border-dashed">
+      <div class="flex justify-between text-gray-500"><span>Total items</span><span class="font-semibold text-gray-700">{{ order.items | length }} product{{ 's' if order.items | length != 1 }} · {{ order.items | sum(attribute='qty') }} unit{{ 's' if order.items | sum(attribute='qty') != 1 }}</span></div>
+      <div class="flex justify-between text-gray-500"><span>Taxable value</span><span>₹{{ '%.2f' | format(order.subtotal) }}</span></div>
+      <div class="flex justify-between text-gray-500"><span>CGST</span><span>₹{{ '%.2f' | format(order.gst_amount / 2) }}</span></div>
+      <div class="flex justify-between text-gray-500"><span>SGST</span><span>₹{{ '%.2f' | format(order.gst_amount / 2) }}</span></div>
+      <div class="flex justify-between font-extrabold text-base pt-1"><span>Grand total</span><span>₹{{ '%.2f' | format(order.total) }}</span></div>
+    </div>
+
+    <div class="px-5 py-3 text-xs text-gray-500 border-b border-dashed">
+      <p>Payment: <span class="font-semibold text-gray-700">{{ 'Razorpay' if order.payment_mode == 'razorpay' else 'Demo UPI' }}</span></p>
+      <p class="truncate">Txn ID: <span class="font-mono">{{ order.razorpay_payment_id }}</span></p>
+    </div>
+
+    <!-- exit QR -->
+    <div class="px-5 py-5 text-center">
+      <p class="text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-2">Exit verification</p>
+      <img src="{{ exit_qr }}" alt="Exit QR" class="w-36 h-36 mx-auto rounded-xl border">
+      <p class="text-xs text-gray-400 mt-2">Staff scans this QR at the exit gate</p>
+    </div>
+
+    <p class="text-center text-[10px] text-gray-300 pb-4">Thank you for shopping with {{ APP_NAME }} 💚</p>
+  </div>
+
+  <!-- actions -->
+  <div class="no-print flex gap-3 mt-5">
+    <button onclick="window.print()"
+            class="flex-1 bg-gray-900 text-white rounded-2xl py-3.5 font-bold active:scale-[0.98] transition">⬇ Save / Print bill</button>
+    <a href="/" class="flex-1 bg-white border border-gray-200 text-gray-700 rounded-2xl py-3.5 font-bold text-center active:scale-[0.98] transition">Shop again</a>
+  </div>
+</div>
+{% endblock %}

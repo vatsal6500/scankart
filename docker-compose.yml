@@ -1,0 +1,18 @@
+services:
+  scankart:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      # Add your Razorpay TEST keys to enable the real checkout popup.
+      # Without them the app uses the built-in demo payment screen.
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID:-}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET:-}
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-scankart123}
+    volumes:
+      - scankart-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  scankart-data:

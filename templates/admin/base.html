@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Admin — {{ APP_NAME }}{% endblock %}</title>
+  <link rel="icon" href="/static/icons/icon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','system-ui','sans-serif'] } } } }</script>
+  {% block head %}{% endblock %}
+</head>
+<body class="bg-gray-100 font-sans text-gray-900 antialiased min-h-screen">
+  <nav class="bg-gray-900 text-white px-6 py-3 flex items-center gap-6 sticky top-0 z-30 no-print">
+    <a href="/admin" class="font-extrabold tracking-tight">🛒 {{ APP_NAME }} <span class="text-emerald-400 text-xs font-bold uppercase ml-1">Admin</span></a>
+    <div class="flex gap-1 text-sm">
+      <a href="/admin" class="px-3 py-1.5 rounded-lg hover:bg-white/10 {% if active == 'dashboard' %}bg-white/10 font-semibold{% endif %}">Dashboard</a>
+      <a href="/admin/products" class="px-3 py-1.5 rounded-lg hover:bg-white/10 {% if active == 'products' %}bg-white/10 font-semibold{% endif %}">Products</a>
+      <a href="/admin/orders" class="px-3 py-1.5 rounded-lg hover:bg-white/10 {% if active == 'orders' %}bg-white/10 font-semibold{% endif %}">Orders</a>
+      <a href="/admin/barcodes" class="px-3 py-1.5 rounded-lg hover:bg-white/10 {% if active == 'barcodes' %}bg-white/10 font-semibold{% endif %}">Barcode sheet</a>
+    </div>
+    <a href="/" class="ml-auto text-sm text-emerald-400 hover:underline">Customer app →</a>
+  </nav>
+  <main class="max-w-6xl mx-auto px-6 py-8">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

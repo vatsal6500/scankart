@@ -1,0 +1,17 @@
+# Render Blueprint — deploys ScanKart as a free Docker web service.
+# In Render: New + → Blueprint → select this repo → Apply.
+services:
+  - type: web
+    name: scankart
+    runtime: docker
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        generateValue: true   # Render generates a strong password — view it in the dashboard
+      - key: RAZORPAY_KEY_ID
+        sync: false           # set manually in dashboard when you have test keys
+      - key: RAZORPAY_KEY_SECRET
+        sync: false

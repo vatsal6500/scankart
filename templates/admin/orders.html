@@ -1,0 +1,44 @@
+{% extends "admin/base.html" %}
+{% set active = 'orders' %}
+{% block content %}
+<h1 class="text-2xl font-extrabold mb-6">Orders</h1>
+<div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-gray-50 text-[11px] uppercase tracking-wider text-gray-400">
+      <tr>
+        <th class="text-left px-5 py-3 font-semibold">Bill No</th>
+        <th class="text-left py-3 font-semibold">Outlet</th>
+        <th class="text-left py-3 font-semibold">Items</th>
+        <th class="text-left py-3 font-semibold">Payment</th>
+        <th class="text-left py-3 font-semibold">Status</th>
+        <th class="text-right py-3 font-semibold">Total</th>
+        <th class="text-right px-5 py-3 font-semibold">Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for o in orders %}
+      <tr class="border-t border-gray-50 align-top">
+        <td class="px-5 py-3 font-mono font-semibold">
+          {% if o.status == 'paid' %}<a href="/bill/{{ o.id }}" class="text-emerald-700 hover:underline">{{ o.id }}</a>
+          {% else %}{{ o.id }}{% endif %}
+        </td>
+        <td class="py-3">{{ o.outlet.name }}</td>
+        <td class="py-3 text-xs text-gray-500 max-w-xs">
+          {% for item in o.items %}{{ item.emoji }} {{ item.name }} ×{{ item.qty }}{{ ', ' if not loop.last }}{% endfor %}
+        </td>
+        <td class="py-3 text-xs">{{ 'Razorpay' if o.payment_mode == 'razorpay' else 'Demo' }}</td>
+        <td class="py-3">
+          {% if o.status == 'paid' %}<span class="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full uppercase">Paid</span>
+          {% elif o.status == 'failed' %}<span class="text-[10px] font-bold bg-red-100 text-red-600 px-2 py-1 rounded-full uppercase">Failed</span>
+          {% else %}<span class="text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-1 rounded-full uppercase">Pending</span>{% endif %}
+        </td>
+        <td class="py-3 text-right font-semibold">₹{{ '%.2f' | format(o.total) }}</td>
+        <td class="py-3 text-right px-5 text-gray-400 whitespace-nowrap">{{ o.created_at.strftime('%d %b, %H:%M') }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" class="text-center text-gray-400 py-8">No orders yet</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

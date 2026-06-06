@@ -126,12 +126,18 @@
   }
 
   // ---------- scanner ----------
-  const SCAN_CONFIG = {
-    fps: 10,
-    // size the scan box to the video so small laptop previews don't error out
-    qrbox: (vw, vh) => ({ width: Math.min(260, Math.floor(vw * 0.8)), height: Math.min(160, Math.floor(vh * 0.6)) }),
-    videoConstraints: { width: { ideal: 1280 }, height: { ideal: 720 } },
-  };
+  // size the scan box to the video so small previews don't error out
+  const SCAN_BOX = (vw, vh) => ({ width: Math.min(260, Math.floor(vw * 0.8)), height: Math.min(160, Math.floor(vh * 0.6)) });
+
+  // html5-qrcode quirk: when config.videoConstraints is set it REPLACES the
+  // camera passed as the first start() argument — so the camera source must
+  // be merged into the constraints, or iOS/WebKit falls back to the front cam.
+  function scanConfig(source) {
+    const vc = typeof source === 'string' ? { deviceId: { exact: source } } : { ...source };
+    vc.width = { ideal: 1280 };
+    vc.height = { ideal: 720 };
+    return { fps: 10, qrbox: SCAN_BOX, videoConstraints: vc };
+  }
 
   function cameraErrorMessage(err) {
     if (!navigator.mediaDevices) return 'Camera needs HTTPS or localhost — type the barcode instead';
@@ -150,7 +156,7 @@
   }
 
   async function startWith(source) {
-    await scanner.start(source, SCAN_CONFIG, onScan, () => {});
+    await scanner.start(source, scanConfig(source), onScan, () => {});
   }
 
   async function openScanner() {
@@ -159,27 +165,26 @@
     scanner = new Html5Qrcode('reader');
     try { cameras = (await Html5Qrcode.getCameras()) || []; } catch { cameras = []; }
     $('switch-camera').classList.toggle('hidden', cameras.length < 2);
-    try {
-      const back = backCameraIndex(cameras);
-      if (back >= 0) {
-        // a camera is explicitly labelled back/rear — use it
-        camIndex = back;
-        await startWith(cameras[camIndex].id);
-      } else {
-        // labels don't identify the back camera — let the browser pick it
-        camIndex = -1;
-        await startWith({ facingMode: 'environment' });
-      }
-    } catch (err) {
-      // last resort: any camera at all (laptops, permission quirks)
+
+    // Try camera sources in order of preference — works across iOS/Android/
+    // desktop and privacy browsers (Brave randomizes labels, so facingMode
+    // comes first; label match and device ids are fallbacks).
+    const attempts = [{ facingMode: 'environment' }];
+    const back = backCameraIndex(cameras);
+    if (back >= 0) attempts.push(cameras[back].id);
+    if (cameras.length) attempts.push(cameras[cameras.length - 1].id);
+    attempts.push({ facingMode: 'user' });
+
+    let lastErr = null;
+    for (const src of attempts) {
       try {
-        if (cameras.length) { camIndex = 0; await startWith(cameras[0].id); }
-        else { camIndex = -1; await startWith({ facingMode: 'user' }); }
-      } catch (err2) {
-        closeScanner();
-        toast(cameraErrorMessage(err2), true);
-      }
+        await startWith(src);
+        camIndex = typeof src === 'string' ? cameras.findIndex(c => c.id === src) : -1;
+        return;
+      } catch (err) { lastErr = err; }
     }
+    closeScanner();
+    toast(cameraErrorMessage(lastErr), true);
   }
 
   async function switchCamera() {

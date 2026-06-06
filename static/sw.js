@@ -1,5 +1,5 @@
 /* ScanKart service worker — cache static assets only; pages stay network-first */
-const CACHE = 'scankart-static-v5';
+const CACHE = 'scankart-static-v6';
 const ASSETS = ['/static/manifest.json', '/static/icons/icon.svg', '/static/js/shop.js'];
 
 self.addEventListener('install', (e) => {

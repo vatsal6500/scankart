@@ -142,23 +142,56 @@
     return 'Camera unavailable — type the barcode or use Browse';
   }
 
+  let cameras = [];
+  let camIndex = -1; // -1 = started via facingMode, not a specific device
+
+  function backCameraIndex(cams) {
+    return cams.findIndex(c => /back|rear|environment/i.test(c.label || ''));
+  }
+
+  async function startWith(source) {
+    await scanner.start(source, SCAN_CONFIG, onScan, () => {});
+  }
+
   async function openScanner() {
     $('scanner-overlay').classList.remove('hidden');
     $('scanner-overlay').classList.add('flex');
     scanner = new Html5Qrcode('reader');
+    try { cameras = (await Html5Qrcode.getCameras()) || []; } catch { cameras = []; }
+    $('switch-camera').classList.toggle('hidden', cameras.length < 2);
     try {
-      // prefer the rear camera (phones)…
-      await scanner.start({ facingMode: 'environment' }, SCAN_CONFIG, onScan, () => {});
+      const back = backCameraIndex(cameras);
+      if (back >= 0) {
+        // a camera is explicitly labelled back/rear — use it
+        camIndex = back;
+        await startWith(cameras[camIndex].id);
+      } else {
+        // labels don't identify the back camera — let the browser pick it
+        camIndex = -1;
+        await startWith({ facingMode: 'environment' });
+      }
     } catch (err) {
-      // …fall back to any available camera (laptops/webcams)
+      // last resort: any camera at all (laptops, permission quirks)
       try {
-        const cams = await Html5Qrcode.getCameras();
-        if (!cams || !cams.length) throw err;
-        await scanner.start(cams[0].id, SCAN_CONFIG, onScan, () => {});
+        if (cameras.length) { camIndex = 0; await startWith(cameras[0].id); }
+        else { camIndex = -1; await startWith({ facingMode: 'user' }); }
       } catch (err2) {
         closeScanner();
         toast(cameraErrorMessage(err2), true);
       }
+    }
+  }
+
+  async function switchCamera() {
+    if (!scanner || cameras.length < 2) return;
+    camIndex = (camIndex + 1) % cameras.length;
+    try { await scanner.stop(); } catch {}
+    try {
+      await startWith(cameras[camIndex].id);
+      const label = cameras[camIndex].label || `Camera ${camIndex + 1}`;
+      toast(`📷 ${label}`);
+    } catch {
+      toast('Could not switch camera', true);
     }
   }
 
@@ -298,6 +331,7 @@
   $('overlay-barcode').addEventListener('keydown', (e) => { if (e.key === 'Enter') manualAdd('overlay-barcode'); });
   $('open-scanner').addEventListener('click', openScanner);
   $('close-scanner').addEventListener('click', closeScanner);
+  $('switch-camera').addEventListener('click', switchCamera);
   $('open-cart').addEventListener('click', openCart);
   $('close-cart').addEventListener('click', closeCart);
   $('cart-sheet-backdrop').addEventListener('click', closeCart);

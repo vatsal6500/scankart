@@ -64,9 +64,14 @@
   <div id="scanner-overlay" class="fixed inset-0 z-50 bg-black hidden flex-col">
     <div class="flex items-center justify-between px-4 py-4 text-white">
       <p class="font-bold">Point camera at barcode</p>
-      <button id="close-scanner" class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-      </button>
+      <div class="flex items-center gap-2">
+        <button id="switch-camera" class="hidden w-9 h-9 rounded-full bg-white/20 items-center justify-center" title="Switch camera">
+          <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M20 20v-5h-5M4 9a8 8 0 0114-3M20 15a8 8 0 01-14 3"/></svg>
+        </button>
+        <button id="close-scanner" class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
     </div>
     <div id="reader" class="flex-1"></div>
     <div class="px-4 pt-3">

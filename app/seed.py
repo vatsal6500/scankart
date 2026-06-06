@@ -27,6 +27,8 @@ CATALOG = [
     ("890101000012", "Coca-Cola 750ml", "Beverages", 40.0, 28.0, "🥤", 140),
     ("890101000013", "Lay's India's Magic Masala 90g", "Snacks", 30.0, 12.0, "🥔", 160),
     ("890101000014", "Cadbury Dairy Milk Silk 150g", "Snacks", 180.0, 18.0, "🍫", 75),
+    # real product barcode (user's demo item — physical jar scans in the app)
+    ("890107170210", "Hershey's Cocoa Powder", "Grocery", 142.0, 18.0, "🍫", 50),
 ]
 
 OUTLETS = [

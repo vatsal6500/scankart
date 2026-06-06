@@ -126,16 +126,27 @@
   }
 
   // ---------- scanner ----------
-  // size the scan box to the video so small previews don't error out
-  const SCAN_BOX = (vw, vh) => ({ width: Math.min(260, Math.floor(vw * 0.8)), height: Math.min(160, Math.floor(vh * 0.6)) });
+  // wide scan box: 1-D barcodes need horizontal room to decode
+  const SCAN_BOX = (vw, vh) => ({ width: Math.min(340, Math.floor(vw * 0.9)), height: Math.min(200, Math.floor(vh * 0.5)) });
+
+  // only the formats we sell — scanning every known format per frame is slow
+  // and drops decode rate badly on phones
+  const SCAN_FORMATS = [
+    Html5QrcodeSupportedFormats.QR_CODE,
+    Html5QrcodeSupportedFormats.EAN_13,
+    Html5QrcodeSupportedFormats.EAN_8,
+    Html5QrcodeSupportedFormats.UPC_A,
+    Html5QrcodeSupportedFormats.UPC_E,
+    Html5QrcodeSupportedFormats.CODE_128,
+  ];
 
   // html5-qrcode quirk: when config.videoConstraints is set it REPLACES the
   // camera passed as the first start() argument — so the camera source must
   // be merged into the constraints, or iOS/WebKit falls back to the front cam.
   function scanConfig(source) {
     const vc = typeof source === 'string' ? { deviceId: { exact: source } } : { ...source };
-    vc.width = { ideal: 1280 };
-    vc.height = { ideal: 720 };
+    vc.width = { ideal: 1920 };
+    vc.height = { ideal: 1080 };
     return { fps: 10, qrbox: SCAN_BOX, videoConstraints: vc };
   }
 
@@ -162,7 +173,12 @@
   async function openScanner() {
     $('scanner-overlay').classList.remove('hidden');
     $('scanner-overlay').classList.add('flex');
-    scanner = new Html5Qrcode('reader');
+    scanner = new Html5Qrcode('reader', {
+      formatsToSupport: SCAN_FORMATS,
+      // native BarcodeDetector where available (Chrome/Android) — much faster
+      experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+      verbose: false,
+    });
     try { cameras = (await Html5Qrcode.getCameras()) || []; } catch { cameras = []; }
     $('switch-camera').classList.toggle('hidden', cameras.length < 2);
 

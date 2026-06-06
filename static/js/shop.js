@@ -34,7 +34,7 @@
     const filtered = products.filter(p =>
       !term || p.name.toLowerCase().includes(term) || p.category.toLowerCase().includes(term));
     if (!filtered.length) {
-      list.innerHTML = '<p class="text-center text-sm text-gray-400 py-8">No products found</p>';
+      list.innerHTML = '<p class="col-span-full text-center text-sm text-gray-400 py-8">No products found</p>';
       return;
     }
     list.innerHTML = filtered.map(p => {

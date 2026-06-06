@@ -5,7 +5,7 @@
 {% if razorpay_enabled %}<script src="https://checkout.razorpay.com/v1/checkout.js"></script>{% endif %}
 {% endblock %}
 {% block content %}
-<div class="min-h-screen flex flex-col max-w-md mx-auto w-full pb-28">
+<div class="min-h-screen flex flex-col max-w-md md:max-w-3xl xl:max-w-5xl mx-auto w-full pb-28">
 
   <!-- Header -->
   <header class="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-gray-100 px-4 py-3 flex items-center gap-3">
@@ -20,7 +20,7 @@
   </header>
 
   <!-- Scan hero button -->
-  <div class="px-4 pt-4">
+  <div class="px-4 pt-4 w-full md:max-w-xl md:mx-auto">
     <button id="open-scanner"
             class="w-full bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-2xl py-5 px-6 shadow-lg shadow-emerald-200 flex items-center justify-center gap-3 font-bold text-lg active:scale-[0.98] transition">
       <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -39,14 +39,14 @@
   </div>
 
   <!-- Search / browse -->
-  <div class="px-4 pt-5">
+  <div class="px-4 pt-5 w-full md:max-w-xl md:mx-auto">
     <div class="flex items-center justify-between mb-2">
       <h2 class="text-sm font-bold uppercase tracking-wider text-gray-400">Or browse products</h2>
     </div>
     <input id="search" type="search" placeholder="Search products…"
            class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
   </div>
-  <main id="product-list" class="px-4 py-4 space-y-2"></main>
+  <main id="product-list" class="px-4 py-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3 items-start"></main>
 
   <!-- Sticky cart bar -->
   <div id="cart-bar" class="fixed bottom-0 inset-x-0 z-30 px-4 pb-4 pt-2 max-w-md mx-auto hidden">
@@ -81,7 +81,7 @@
 
   <!-- Cart sheet -->
   <div id="cart-sheet-backdrop" class="fixed inset-0 z-40 bg-black/40 hidden"></div>
-  <div id="cart-sheet" class="fixed bottom-0 inset-x-0 z-50 max-w-md mx-auto bg-white rounded-t-3xl shadow-2xl translate-y-full transition-transform duration-300 max-h-[85vh] flex flex-col">
+  <div id="cart-sheet" class="fixed bottom-0 inset-x-0 z-50 max-w-md md:max-w-lg mx-auto bg-white rounded-t-3xl shadow-2xl translate-y-full transition-transform duration-300 max-h-[85vh] flex flex-col">
     <div class="p-4 border-b border-gray-100 flex items-center justify-between">
       <h3 class="font-extrabold text-lg">Your cart</h3>
       <button id="close-cart" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">

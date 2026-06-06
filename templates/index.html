@@ -7,7 +7,7 @@
   <header class="bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 text-white px-6 pt-12 pb-16 rounded-b-[2.5rem] shadow-lg relative overflow-hidden">
     <div class="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-full"></div>
     <div class="absolute top-24 -left-12 w-32 h-32 bg-white/10 rounded-full"></div>
-    <div class="relative max-w-md mx-auto">
+    <div class="relative max-w-md md:max-w-2xl lg:max-w-4xl mx-auto">
       <div class="flex items-center gap-3 mb-6">
         <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center text-2xl">🛒</div>
         <h1 class="text-3xl font-extrabold tracking-tight">{{ APP_NAME }}</h1>
@@ -18,7 +18,7 @@
   </header>
 
   <!-- Steps -->
-  <div class="max-w-md mx-auto w-full px-6 -mt-8 relative z-10">
+  <div class="max-w-md md:max-w-2xl lg:max-w-4xl mx-auto w-full px-6 -mt-8 relative z-10">
     <div class="bg-white rounded-2xl shadow-md p-4 flex justify-between text-center text-xs font-medium text-gray-600">
       <div class="flex-1"><div class="text-2xl mb-1">📍</div>Choose<br>store</div>
       <div class="flex-1"><div class="text-2xl mb-1">📷</div>Scan<br>products</div>
@@ -28,9 +28,9 @@
   </div>
 
   <!-- Outlet list -->
-  <main class="max-w-md mx-auto w-full px-6 py-8 flex-1">
+  <main class="max-w-md md:max-w-2xl lg:max-w-4xl mx-auto w-full px-6 py-8 flex-1">
     <h2 class="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4">Select your store</h2>
-    <div class="space-y-3">
+    <div class="grid gap-3 md:grid-cols-2">
       {% for outlet in outlets %}
       <a href="/shop/{{ outlet.id }}"
          class="flex items-center gap-4 bg-white rounded-2xl shadow-sm hover:shadow-md transition-all p-4 border border-gray-100 active:scale-[0.98]">
